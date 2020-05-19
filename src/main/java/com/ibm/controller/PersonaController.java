@@ -70,8 +70,8 @@ public class PersonaController {
 
 		try {
 			Persona person = new Persona();
-			person.setNombre(persona.getNombre());
-			person.setApellido(persona.getApellido());
+			person.setNombres(persona.getNombres());
+			person.setApellidos(persona.getApellidos());
 			person.setEdad(persona.getEdad());
 			person.setSexo(persona.getSexo());
 			person = personaService.create(persona);

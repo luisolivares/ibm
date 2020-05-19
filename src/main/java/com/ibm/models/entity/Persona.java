@@ -20,11 +20,11 @@ public class Persona implements Serializable {
 	@Column(name = "id")
 	private Integer id;
 
-	@Column(name = "nombre")
-	private String nombre;
+	@Column(name = "nombres")
+	private String nombres;
 
-	@Column(name = "apellido")
-	private String apellido;
+	@Column(name = "apellidos")
+	private String apellidos;
 
 	@Column(name = "edad")
 	private Integer edad;
@@ -37,10 +37,10 @@ public class Persona implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Persona(Integer id, String nombre, String apellido, Integer edad, String sexo) {
+	public Persona(Integer id, String nombres, String apellidos, Integer edad, String sexo) {
 		this.id = id;
-		this.nombre = nombre;
-		this.apellido = apellido;
+		this.nombres = nombres;
+		this.apellidos = apellidos;
 		this.edad = edad;
 		this.sexo = sexo;
 	}
@@ -49,12 +49,12 @@ public class Persona implements Serializable {
 		return id;
 	}
 
-	public String getNombre() {
-		return nombre;
+	public String getNombres() {
+		return nombres;
 	}
 
-	public String getApellido() {
-		return apellido;
+	public String getApellidos() {
+		return apellidos;
 	}
 
 	public Integer getEdad() {
@@ -69,12 +69,12 @@ public class Persona implements Serializable {
 		this.id = id;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
 	}
 
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
 
 	public void setEdad(Integer edad) {

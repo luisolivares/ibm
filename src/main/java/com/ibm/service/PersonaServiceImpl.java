@@ -65,8 +65,8 @@ public class PersonaServiceImpl implements PersonaService {
 
 			if (person.isPresent()) {
 				persona.setId(persona.getId());
-				persona.setNombre(persona.getNombre());
-				persona.setApellido(persona.getApellido());
+				persona.setNombres(persona.getNombres());
+				persona.setApellidos(persona.getApellidos());
 				persona.setEdad(persona.getEdad());
 				persona.setSexo(persona.getSexo());
 				persona = personaDAO.save(persona);
