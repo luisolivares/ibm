@@ -1,1 +1,0 @@
-INSERT INTO persona (id, nombres, apellidos, edad, sexo) VALUES (1, 'Luis Alberto', 'Olivares Peña', 30, 'Masculino'), (2, 'Ana', 'Vazquez Peña', 64, 'Femenino'), (3, 'Luis Oswaldo', 'Olivares Peña', 72, 'Masculino'), (4, 'Luis', 'Olivares Peña', 38, 'Masculino'), (5, 'Luisana', 'Olivares Peña', 44, 'Femenino');

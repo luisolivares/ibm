@@ -1,10 +1,12 @@
-package com.ibm.service;
+package com.ibm.domain.person.service;
 
 import java.util.List;
 
-import com.ibm.models.entity.Persona;
+import com.ibm.domain.person.model.entity.Persona;
+import com.ibm.domain.person.model.entity.TipoDocumento;
+import com.ibm.domain.person.model.request.PersonaRequest;
 
-public interface PersonaService {
+public interface PersonService {
 
 	/**
 	 * Método donde listamos a las personas y realizamos una páginación de la misma.
@@ -17,10 +19,10 @@ public interface PersonaService {
 	/**
 	 * Método donde se crea el recurso Persona.
 	 * 
-	 * @param persona
+	 * @param request
 	 *            Objecto persona donde contiene los datos para ser creados.
 	 **/
-	public Persona create(Persona persona);
+	public Persona create(PersonaRequest request);
 
 	/**
 	 * Método donde se actualiza el recurso Persona.
@@ -28,7 +30,7 @@ public interface PersonaService {
 	 * @param persona
 	 *            Objecto que se utiliza para actualizar a la persona en cuestión.
 	 **/
-	public Persona update(Persona persona);
+	public Persona update(PersonaRequest request, TipoDocumento tipoDocumento, String documento);
 
 	/**
 	 * Método donde se busca por id o por identificador unico a la persona en
@@ -37,7 +39,7 @@ public interface PersonaService {
 	 * @param id
 	 *            Id o identificador unico de la persona en cuestión.
 	 **/
-	public Persona findById(Integer id);
+	public Persona findByDocumento(TipoDocumento tipoDocumento, String documento);
 
 	/**
 	 * Método donde se elimina el recurso Persona.
@@ -45,6 +47,6 @@ public interface PersonaService {
 	 * @param id
 	 *            Id o identificador unico del objecto a ser eliminado.
 	 **/
-	public boolean delete(Integer id);
+	public void delete(TipoDocumento tipoDocumento, String documento);
 
 }

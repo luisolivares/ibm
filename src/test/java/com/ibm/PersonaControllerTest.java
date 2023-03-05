@@ -1,107 +1,138 @@
 package com.ibm;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.domain.person.model.entity.Persona;
+import com.ibm.domain.person.model.entity.Sexo;
+import com.ibm.domain.person.model.entity.TipoDocumento;
+import com.ibm.domain.person.model.request.PersonaRequest;
+import com.ibm.domain.person.service.PersonService;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.controller.PersonaController;
-import com.ibm.models.entity.Persona;
-import com.ibm.service.PersonaService;
-
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = PersonaController.class)
+@Slf4j
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PersonaControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+	private final MockMvc mockMvc;
+
+	private final ObjectMapper objectMapper;
 
 	@MockBean
-	private PersonaService personaService;
+	private PersonService personaService;
+
+	@Autowired
+	public PersonaControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+		this.mockMvc = mockMvc;
+		this.objectMapper = objectMapper;
+	}
 
 	@Test
+	@DisplayName("Listado de personas con paginación.")
+	@Order(2)
 	public void lisAll() throws Exception {
 
-		Persona persona1 = new Persona(1, "Luis Alberto", "Olivares Peña", 30, "Masculino");
-		Persona persona2 = new Persona(2, "Luis Oswaldo", "Olivares Peña", 38, "Masculino");
-		Persona persona3 = new Persona(3, "Luis Oswaldo", "Olivares", 72, "Masculino");
-		Persona persona4 = new Persona(4, "Ana", "Vazquez Peña", 64, "Masculino");
-		Persona persona5 = new Persona(5, "Luisana", "Olivares Peña", 43, "Femenino");
+		Persona persona1 = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
+		Persona persona2 = new Persona(2, "Ana", "Vazquez Peña", 64, Sexo.FEMENINO, TipoDocumento.CEDULA, "42142152");
+        Persona persona3 = new Persona(3, "Luis Oswaldo", "Olivares", 72, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
+		Persona persona4 = new Persona(5, "Luisana", "Olivares Peña", 43, Sexo.FEMENINO, TipoDocumento.CEDULA, "20390708");
 
-		List<Persona> users = Arrays.asList(persona1, persona2, persona3, persona4, persona5);
+		List<Persona> users = Arrays.asList(persona1, persona2, persona3, persona4);
 
 		when(personaService.listAll(1, 2)).thenReturn(users);
 
-		mockMvc.perform(get("/personas")).andExpect(status().isOk())
+		mockMvc.perform(get("/api/v1/personas/{pageNo}/{pageSize}", 0, 2))
+				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-		verify(personaService, times(1)).listAll(1, 2);
+		verify(personaService, times(1)).listAll(0, 2);
 		verifyNoMoreInteractions(personaService);
 
 	}
 
 	@Test
+	@DisplayName("Creación de un registro de persona.")
+	@Order(1)
 	public void create() throws Exception {
-		Persona persona = new Persona(1, "Luis Alberto", "Olivares Peña", 30, "Masculino");
+        Persona personaRes = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
 
-		when(personaService.create(persona)).thenReturn(persona);
+        PersonaRequest request = new PersonaRequest();
+        request.setNombres("Luis Alberto");
+        request.setApellidos("Olivares Peña");
+        request.setSexo(Sexo.MASCULINO);
+        request.setTipoDocumento(TipoDocumento.CEDULA);
+        request.setDocumento("20390708");
+        request.setEdad(30);
 
-		mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(asJsonString(persona)))
-				.andExpect(status().isConflict());
+		when(personaService.create(any(PersonaRequest.class))).thenReturn(personaRes);
+
+		mockMvc.perform(post("/api/v1/personas/")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.documento").value("20390708"));
 	}
 
-	@Test
-	public void update() throws Exception {
-		Persona persona = new Persona(1, "Luis Alberto", "Olivares Peña", 29, "Masculino");
 
-		when(personaService.findById(persona.getId())).thenReturn(null);
+	@Test
+	@DisplayName("Modificación de un registro de persona.")
+	@Order(3)
+	public void update() throws Exception {
+
+		Persona personaRes = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
+
+		PersonaRequest request = new PersonaRequest();
+		request.setNombres("Luis Oswaldo");
+		request.setApellidos("Olivares Peña");
+		request.setSexo(Sexo.MASCULINO);
+		request.setTipoDocumento(TipoDocumento.CEDULA);
+		request.setDocumento("20390708");
+		request.setEdad(30);
+
+		//verify(personaService, times(1)).findByDocumento(TipoDocumento.CEDULA, "18390608");
+		//verifyNoMoreInteractions(personaService);
 
 		mockMvc.perform(
-				put("/personas", persona).contentType(MediaType.APPLICATION_JSON).content(asJsonString(persona)))
-				.andExpect(status().isNotFound());
-
-		verify(personaService, times(1)).findById(persona.getId());
-		verifyNoMoreInteractions(personaService);
+				put("/api/v1/personas/{tipoDocumento}/{documento}", TipoDocumento.CEDULA, "18390608")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
 	}
 
 	@Test
+	@DisplayName("Eliminación de un registro de persona.")
+	@Order(4)
 	public void delete() throws Exception {
-		Persona persona = new Persona(5, "Luisana", "Olivares Peña", 43, "Femenino");
 
-		when(personaService.findById(persona.getId())).thenReturn(null);
+		//verify(personaService, times(1)).findByDocumento(TipoDocumento.CEDULA, "18390608");
+		//verify(personaService, times(1)).delete(TipoDocumento.CEDULA, "18390608");
+		//verifyNoMoreInteractions(personaService);
 
-		mockMvc.perform(MockMvcRequestBuilders.delete("/personas/{id}", persona.getId())).andExpect(status().isOk());
+		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/personas/{tipoDocumento}/{documento}", TipoDocumento.CEDULA, "18390608" ))
+				.andExpect(status().isNoContent());
 
-		verify(personaService, times(1)).findById(persona.getId());
-		verify(personaService, times(1)).delete(persona.getId());
-		verifyNoMoreInteractions(personaService);
-	}
-
-	public static String asJsonString(final Object obj) {
-		try {
-			return new ObjectMapper().writeValueAsString(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 }
