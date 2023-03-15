@@ -1,7 +1,7 @@
 package com.ibm.domain.person.repository;
 
 import com.ibm.domain.person.model.entity.Persona;
-import com.ibm.domain.person.model.entity.TipoDocumento;
+import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

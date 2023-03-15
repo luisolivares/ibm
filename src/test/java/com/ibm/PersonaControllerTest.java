@@ -2,8 +2,8 @@ package com.ibm;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.domain.person.model.entity.Persona;
-import com.ibm.domain.person.model.entity.Sexo;
-import com.ibm.domain.person.model.entity.TipoDocumento;
+import com.ibm.domain.person.model.enumerated.Sexo;
+import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
 import com.ibm.domain.person.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
@@ -111,9 +111,6 @@ public class PersonaControllerTest {
 		request.setDocumento("20390708");
 		request.setEdad(30);
 
-		//verify(personaService, times(1)).findByDocumento(TipoDocumento.CEDULA, "18390608");
-		//verifyNoMoreInteractions(personaService);
-
 		mockMvc.perform(
 				put("/api/v1/personas/{tipoDocumento}/{documento}", TipoDocumento.CEDULA, "18390608")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -125,10 +122,6 @@ public class PersonaControllerTest {
 	@DisplayName("Eliminación de un registro de persona.")
 	@Order(4)
 	public void delete() throws Exception {
-
-		//verify(personaService, times(1)).findByDocumento(TipoDocumento.CEDULA, "18390608");
-		//verify(personaService, times(1)).delete(TipoDocumento.CEDULA, "18390608");
-		//verifyNoMoreInteractions(personaService);
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/personas/{tipoDocumento}/{documento}", TipoDocumento.CEDULA, "18390608" ))
 				.andExpect(status().isNoContent());

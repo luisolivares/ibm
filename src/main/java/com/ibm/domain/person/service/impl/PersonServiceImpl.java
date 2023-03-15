@@ -1,10 +1,11 @@
 package com.ibm.domain.person.service.impl;
 
 import com.ibm.domain.person.model.entity.Persona;
-import com.ibm.domain.person.model.entity.TipoDocumento;
+import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
 import com.ibm.domain.person.repository.PersonRepository;
 import com.ibm.domain.person.service.PersonService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -22,15 +23,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@AllArgsConstructor
 @Service("personServiceImpl")
 public class PersonServiceImpl implements PersonService {
 
     @Qualifier("personRepository")
     private final PersonRepository personRepository;
-
-    public PersonServiceImpl(PersonRepository personRepository) {
-        this.personRepository = personRepository;
-    }
 
     @Transactional(readOnly = true)
     @Override

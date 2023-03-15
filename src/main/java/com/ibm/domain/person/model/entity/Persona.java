@@ -1,5 +1,7 @@
 package com.ibm.domain.person.model.entity;
 
+import com.ibm.domain.person.model.enumerated.Sexo;
+import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
