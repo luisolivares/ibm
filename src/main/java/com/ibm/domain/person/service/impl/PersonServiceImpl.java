@@ -5,8 +5,9 @@ import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
 import com.ibm.domain.person.repository.PersonRepository;
 import com.ibm.domain.person.service.PersonService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Service("personServiceImpl")
 public class PersonServiceImpl implements PersonService {
 
@@ -47,14 +48,19 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public Persona create(PersonaRequest request) {
         try {
-            Persona person = new Persona();
-            person.setNombres(request.getNombres());
-            person.setApellidos(request.getApellidos());
-            person.setEdad(request.getEdad());
-            person.setSexo(request.getSexo());
-            person.setTipoDocumento(request.getTipoDocumento());
-            person.setDocumento(request.getDocumento());
-            return personRepository.save(person);
+            Optional<Persona> persona = personRepository.findByDocumento(request.getTipoDocumento(), request.getDocumento());
+            if (persona.isPresent()) {
+                Persona person = new Persona();
+                person.setNombres(request.getNombres());
+                person.setApellidos(request.getApellidos());
+                person.setEdad(request.getEdad());
+                person.setSexo(request.getSexo());
+                person.setTipoDocumento(request.getTipoDocumento());
+                person.setDocumento(request.getDocumento());
+                return personRepository.save(person);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Ya existe una persona cuyo documento es %s %s", request.getTipoDocumento(), request.getDocumento()));
+            }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear una persona", e);
         }
@@ -71,33 +77,33 @@ public class PersonServiceImpl implements PersonService {
             persona.get().setSexo(request.getSexo());
             persona.get().setTipoDocumento(request.getTipoDocumento());
             persona.get().setDocumento(request.getDocumento());
-			return personRepository.saveAndFlush(persona.get());
+            return personRepository.saveAndFlush(persona.get());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona");
         }
     }
 
-	@Transactional(readOnly = true)
-	@Override
-	public Persona findByDocumento(TipoDocumento tipoDocumento, String documento) {
-		Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
-		if (persona.isPresent()) {
-			return persona.get();
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
-		}
-	}
+    @Transactional(readOnly = true)
+    @Override
+    public Persona findByDocumento(TipoDocumento tipoDocumento, String documento) {
+        Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
+        if (persona.isPresent()) {
+            return persona.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
+        }
+    }
 
 
-	@Transactional(rollbackFor = {SQLException.class})
-	@Override
-	public void delete(TipoDocumento tipoDocumento, String documento) {
-		Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
-		if (persona.isPresent()) {
-			personRepository.deleteByDocumento(tipoDocumento, documento);
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
-		}
-	}
+    @Transactional(rollbackFor = {SQLException.class})
+    @Override
+    public void delete(TipoDocumento tipoDocumento, String documento) {
+        Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
+        if (persona.isPresent()) {
+            personRepository.deleteByDocumento(tipoDocumento, documento);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
+        }
+    }
 
 }

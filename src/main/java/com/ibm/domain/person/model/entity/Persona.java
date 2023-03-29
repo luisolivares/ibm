@@ -40,6 +40,6 @@ public class Persona implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private TipoDocumento tipoDocumento;
 
-	@Column(name = "documento")
+	@Column(name = "documento", unique = true)
 	private String documento;
 }
