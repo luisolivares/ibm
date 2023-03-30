@@ -49,7 +49,7 @@ public class PersonServiceImpl implements PersonService {
     public Persona create(PersonaRequest request) {
         try {
             Optional<Persona> persona = personRepository.findByDocumento(request.getTipoDocumento(), request.getDocumento());
-            if (persona.isPresent()) {
+            if (persona.isEmpty()) {
                 Persona person = new Persona();
                 person.setNombres(request.getNombres());
                 person.setApellidos(request.getApellidos());
@@ -93,7 +93,6 @@ public class PersonServiceImpl implements PersonService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
         }
     }
-
 
     @Transactional(rollbackFor = {SQLException.class})
     @Override

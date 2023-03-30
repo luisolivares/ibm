@@ -1,4 +1,3 @@
 FROM openjdk:17-alpine
-ARG JAR_FILE=*.jar
-COPY ${JAR_FILE} application.jar
-ENTRYPOINT ["java", "-jar", "application.jar"]
+ADD target/*.jar app-rest-ibm.jar
+ENTRYPOINT ["java","-jar","app-rest-ibm.jar"]
