@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
+import com.ibm.domain.person.model.response.ResponseApiDTO;
 import com.ibm.domain.person.service.PersonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +26,18 @@ public class PersonController {
 	private final PersonService personaService;
 
 	@GetMapping(value = "/{pageNo}/{pageSize}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Persona>> listAllPaginate(@PathVariable(name = "pageNo", required = true) Integer pageNo,
+	public ResponseEntity<ResponseApiDTO<List<Persona>>> listAllPaginate(@PathVariable(name = "pageNo", required = true) Integer pageNo,
 			@PathVariable(name="pageSize", required = true) Integer pageSize) {
 		return new ResponseEntity<>(this.personaService.listAll(pageNo, pageSize), HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Persona> create(@Valid @RequestBody PersonaRequest persona) {
+	public ResponseEntity<ResponseApiDTO<Persona>> create(@Valid @RequestBody PersonaRequest persona) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(personaService.create(persona));
 	}
 
 	@PutMapping(value = "/{tipoDocumento}/{documento}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Persona> update(@Valid @RequestBody PersonaRequest request, @PathVariable("tipoDocumento") TipoDocumento tipoDocumento, @PathVariable("documento") String documento) {
+	public ResponseEntity<ResponseApiDTO<Persona>> update(@Valid @RequestBody PersonaRequest request, @PathVariable("tipoDocumento") TipoDocumento tipoDocumento, @PathVariable("documento") String documento) {
 		return ResponseEntity.status(HttpStatus.OK).body(personaService.update(request, tipoDocumento, documento));
 	}
 

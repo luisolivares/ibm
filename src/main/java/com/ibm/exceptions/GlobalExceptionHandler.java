@@ -1,5 +1,6 @@
 package com.ibm.exceptions;
 
+import com.ibm.domain.person.model.response.ResponseApiDTO;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import java.util.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ResponseApiDTO> handleValidationErrors(MethodArgumentNotValidException ex) {
         final List<String> errors = new ArrayList<>();
         for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getField() + ": " + error.getDefaultMessage());
@@ -32,7 +33,8 @@ public class GlobalExceptionHandler {
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
         }
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -48,56 +50,60 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
-    public ResponseEntity<Object> handleConstraintViolation(final ConstraintViolationException ex) {
+    public ResponseEntity<ResponseApiDTO> handleConstraintViolation(final ConstraintViolationException ex) {
         log.info(ex.getClass().getName());
         final List<String> errors = new ArrayList<>();
         for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             errors.add(violation.getRootBeanClass().getName() + " " + violation.getPropertyPath() + ": " + violation.getMessage());
         }
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), apiError.status());
     }
 
     // 404
     @ExceptionHandler({NoHandlerFoundException.class})
-    protected ResponseEntity<Object> handleNoHandlerFoundException(final NoHandlerFoundException ex) {
+    protected ResponseEntity<ResponseApiDTO> handleNoHandlerFoundException(final NoHandlerFoundException ex) {
         log.info(ex.getClass().getName());
         final String error = "No handler found for " + ex.getHttpMethod() + " " + ex.getRequestURL();
         final ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), Arrays.asList(error));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), apiError.status());
     }
 
     // 405
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(final HttpRequestMethodNotSupportedException ex) {
+    protected ResponseEntity<ResponseApiDTO> handleHttpRequestMethodNotSupported(final HttpRequestMethodNotSupportedException ex) {
         log.info(ex.getClass().getName());
         final StringBuilder builder = new StringBuilder();
         builder.append(ex.getMethod());
         builder.append(" Method is not supported for this request. Supported methods are ");
         ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
         final ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED, ex.getLocalizedMessage(), Arrays.asList(builder.toString()));
-        new ApiError(HttpStatus.METHOD_NOT_ALLOWED, ex.getLocalizedMessage(), Arrays.asList(builder.toString()));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), apiError.status());
     }
 
     // 415
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(final HttpMediaTypeNotSupportedException ex) {
+    protected ResponseEntity<ResponseApiDTO> handleHttpMediaTypeNotSupported(final HttpMediaTypeNotSupportedException ex) {
         log.info(ex.getClass().getName());
         final StringBuilder builder = new StringBuilder();
         builder.append(ex.getContentType());
         builder.append(" Media type is not supported. Supported media types are ");
         ex.getSupportedMediaTypes().forEach(t -> builder.append(t + " "));
         final ApiError apiError = new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getLocalizedMessage(), Arrays.asList(builder.substring(0, builder.length() - 2)));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), apiError.status());
     }
 
     // 500
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleAll(final Exception ex, final WebRequest request) {
+    public ResponseEntity<ResponseApiDTO> handleAll(final Exception ex, final WebRequest request) {
         log.info(ex.getClass().getName());
         log.error("error", ex);
         final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), Arrays.asList("error occurred"));
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+        ResponseApiDTO responseApiDTO = new ResponseApiDTO(null , apiError);
+        return new ResponseEntity<>(responseApiDTO, new HttpHeaders(), apiError.status());
     }
 }

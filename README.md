@@ -5,7 +5,7 @@ Microservicio API REST con Spring Boot y MySQL para la gestión a nivel de CRUD 
 Para deployar todos los contenedores en docker-compose se debe realizar ejecutar los siguientes comandos en la terminal (la ruta puede variar):
 
 ```
-cd C:\Users\user\IdeaProjects\microservices-architecture-example
+cd C:\Users\user\IdeaProjects\ibm
 mvn clean package -DskipTests
 docker-compose up -d
 ```

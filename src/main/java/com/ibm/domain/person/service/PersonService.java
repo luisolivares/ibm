@@ -5,16 +5,17 @@ import java.util.List;
 import com.ibm.domain.person.model.entity.Persona;
 import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
+import com.ibm.domain.person.model.response.ResponseApiDTO;
 
 public interface PersonService {
 
-	List<Persona> listAll(Integer pageNo, Integer pageSize);
+	ResponseApiDTO<List<Persona>> listAll(Integer pageNo, Integer pageSize);
 
-	Persona create(PersonaRequest request);
+	ResponseApiDTO<Persona> create(PersonaRequest request);
 
-	Persona update(PersonaRequest request, TipoDocumento tipoDocumento, String documento);
+	ResponseApiDTO<Persona> update(PersonaRequest request, TipoDocumento tipoDocumento, String documento);
 
-	Persona findByDocumento(TipoDocumento tipoDocumento, String documento);
+	ResponseApiDTO<Persona> findByDocumento(TipoDocumento tipoDocumento, String documento);
 
 	void delete(TipoDocumento tipoDocumento, String documento);
 

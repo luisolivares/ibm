@@ -5,6 +5,7 @@ import com.ibm.domain.person.model.entity.Persona;
 import com.ibm.domain.person.model.enumerated.Sexo;
 import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
+import com.ibm.domain.person.model.response.ResponseApiDTO;
 import com.ibm.domain.person.service.PersonService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ public class PersonaControllerTest {
 	@Test
 	@DisplayName("Listado de personas con paginación.")
 	@Order(2)
-	public void lisAll() throws Exception {
+	void lisAll() throws Exception {
 
 		Persona persona1 = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
 		Persona persona2 = new Persona(2, "Ana", "Vazquez Peña", 64, Sexo.FEMENINO, TipoDocumento.CEDULA, "42142152");
@@ -60,7 +61,7 @@ public class PersonaControllerTest {
 
 		List<Persona> users = Arrays.asList(persona1, persona2, persona3, persona4);
 
-		when(personaService.listAll(1, 2)).thenReturn(users);
+		when(personaService.listAll(1, 2)).thenReturn(new ResponseApiDTO(users, null));
 
 		mockMvc.perform(get("/api/v1/personas/{pageNo}/{pageSize}", 0, 2))
 				.andExpect(status().isOk())
@@ -74,7 +75,7 @@ public class PersonaControllerTest {
 	@Test
 	@DisplayName("Creación de un registro de persona.")
 	@Order(1)
-	public void create() throws Exception {
+	void create() throws Exception {
         Persona personaRes = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
 
         PersonaRequest request = new PersonaRequest();
@@ -85,7 +86,7 @@ public class PersonaControllerTest {
         request.setDocumento("20390708");
         request.setEdad(30);
 
-		when(personaService.create(any(PersonaRequest.class))).thenReturn(personaRes);
+		when(personaService.create(any(PersonaRequest.class))).thenReturn(new ResponseApiDTO(personaRes, null));
 
 		mockMvc.perform(post("/api/v1/personas/")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +100,7 @@ public class PersonaControllerTest {
 	@Test
 	@DisplayName("Modificación de un registro de persona.")
 	@Order(3)
-	public void update() throws Exception {
+	void update() throws Exception {
 
 		Persona personaRes = new Persona(1, "Luis Alberto", "Olivares Peña", 30, Sexo.MASCULINO, TipoDocumento.CEDULA, "20390708");
 
@@ -121,7 +122,7 @@ public class PersonaControllerTest {
 	@Test
 	@DisplayName("Eliminación de un registro de persona.")
 	@Order(4)
-	public void delete() throws Exception {
+	void delete() throws Exception {
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/personas/{tipoDocumento}/{documento}", TipoDocumento.CEDULA, "18390608" ))
 				.andExpect(status().isNoContent());

@@ -4,6 +4,7 @@ import com.ibm.domain.person.model.enumerated.Sexo;
 import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "Persona")
 @Table(name = "persona")
 public class Persona implements Serializable {

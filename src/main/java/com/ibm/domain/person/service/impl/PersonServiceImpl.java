@@ -3,6 +3,7 @@ package com.ibm.domain.person.service.impl;
 import com.ibm.domain.person.model.entity.Persona;
 import com.ibm.domain.person.model.enumerated.TipoDocumento;
 import com.ibm.domain.person.model.request.PersonaRequest;
+import com.ibm.domain.person.model.response.ResponseApiDTO;
 import com.ibm.domain.person.repository.PersonRepository;
 import com.ibm.domain.person.service.PersonService;
 import lombok.RequiredArgsConstructor;
@@ -33,20 +34,20 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Persona> listAll(Integer pageNo, Integer pageSize) {
+    public ResponseApiDTO<List<Persona>> listAll(Integer pageNo, Integer pageSize) {
         String sortBy = "documento";
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<Persona> pagedResult = personRepository.findAll(paging);
         if (pagedResult.hasContent()) {
-            return pagedResult.getContent();
+            return new ResponseApiDTO(pagedResult.getContent(), null);
         } else {
-            return new ArrayList<>();
+            return new ResponseApiDTO(new ArrayList<>(), null);
         }
     }
 
     @Transactional(rollbackFor = {SQLException.class})
     @Override
-    public Persona create(PersonaRequest request) {
+    public ResponseApiDTO<Persona> create(PersonaRequest request) {
         try {
             Optional<Persona> persona = personRepository.findByDocumento(request.getTipoDocumento(), request.getDocumento());
             if (persona.isEmpty()) {
@@ -57,7 +58,7 @@ public class PersonServiceImpl implements PersonService {
                 person.setSexo(request.getSexo());
                 person.setTipoDocumento(request.getTipoDocumento());
                 person.setDocumento(request.getDocumento());
-                return personRepository.save(person);
+                return new ResponseApiDTO(personRepository.save(person), null);
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Ya existe una persona cuyo documento es %s %s", request.getTipoDocumento(), request.getDocumento()));
             }
@@ -68,7 +69,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional(rollbackFor = {SQLException.class})
     @Override
-    public Persona update(PersonaRequest request, TipoDocumento tipoDocumento, String documento) {
+    public ResponseApiDTO<Persona> update(PersonaRequest request, TipoDocumento tipoDocumento, String documento) {
         Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
         if (persona.isPresent()) {
             persona.get().setNombres(request.getNombres());
@@ -77,7 +78,7 @@ public class PersonServiceImpl implements PersonService {
             persona.get().setSexo(request.getSexo());
             persona.get().setTipoDocumento(request.getTipoDocumento());
             persona.get().setDocumento(request.getDocumento());
-            return personRepository.saveAndFlush(persona.get());
+            return new ResponseApiDTO(personRepository.saveAndFlush(persona.get()), null);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona");
         }
@@ -85,10 +86,10 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional(readOnly = true)
     @Override
-    public Persona findByDocumento(TipoDocumento tipoDocumento, String documento) {
+    public ResponseApiDTO<Persona> findByDocumento(TipoDocumento tipoDocumento, String documento) {
         Optional<Persona> persona = personRepository.findByDocumento(tipoDocumento, documento);
         if (persona.isPresent()) {
-            return persona.get();
+            return new ResponseApiDTO(persona.get(), null);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error al modificar la persona cuyo documento es " + documento);
         }
